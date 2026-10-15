@@ -169,6 +169,15 @@
   }
   .hero .btn { color: #fff; width: 100%; max-width: 320px; background: rgba(0,0,0,.12); }
   .hero .btn:hover { background: #fff; color: #4a3a2e; }
+  @media (max-width: 640px) {
+    .hero { background: #1e140e; }
+    .hero .scene { bottom: auto; height: 58%; background-position: 52% 0 !important; }
+    .hero::after { background: linear-gradient(180deg, rgba(40,28,20,.25), rgba(30,20,14,0) 22%, rgba(30,20,14,0) 40%, #1e140e 58%); }
+    .hero .inner { bottom: 40px; }
+    .hero h1 { font-size: 40px; }
+    .hero .script { font-size: 24px; }
+    .hero .when { margin: 12px auto 18px; }
+  }
 
   /* ---------- Shared section type ---------- */
   section { position: relative; }
@@ -312,7 +321,6 @@
     <a href="#rsvp">RSVP</a>
   </nav>
 
-  <button class="music" id="music" aria-label="Play music" aria-pressed="false">♪</button>
 
   <!-- Hero -->
   <section class="hero" id="top">
@@ -573,6 +581,11 @@
       $("thanksH").textContent = "We'll miss you, " + first + ".";
       $("thanksP").textContent = "One last step: send your reply in WhatsApp so we get it. Thank you for letting us know.";
     }
+    /* save RSVP to Google Sheet (best effort; WhatsApp still opens) */
+    try {
+      var body = new URLSearchParams({ name: name, attending: attend === "yes" ? "Yes" : "No", guests: attend === "yes" ? n : "0", note: note });
+      fetch("https://script.google.com/macros/s/AKfycbzmvZY2L_GK44bAmvbwZvq_xSk8ULQkx8usWbGzvE6-TC3KxNf6DtmEHTO03cUG3Ewe/exec", { method: "POST", mode: "no-cors", body: body, keepalive: true }).catch(function () {});
+    } catch (e) {}
     window.open(url, "_blank", "noopener");
   });
 
@@ -591,7 +604,7 @@
     c.forEach(function (f, i) { note(f, t + i * .35, 4.2); });
     note(c[0] / 2, t, 4.2);
   }
-  $("music").addEventListener("click", function () {
+  if ($("music")) $("music").addEventListener("click", function () {
     var btn = this;
     try {
       if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = .8; master.connect(ctx.destination); }
